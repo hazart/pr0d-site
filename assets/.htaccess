@@ -9,6 +9,17 @@
 #   perishablepress.com/press/2006/01/10/stupid-htaccess-tricks/
 #   Sample .htaccess file of CMS MODx: modxcms.com
 
+# ----------------------------------------------------------------------
+# Backbone Pushstate
+# ----------------------------------------------------------------------
+
+<ifModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !index
+    RewriteRule !\.(js|ico|gif|jpg|png|css)$ index.html [L]
+</ifModule>
 
 # ----------------------------------------------------------------------
 # Better website experience for IE users
@@ -309,9 +320,9 @@ FileETag None
 # TCP-connection. Be aware of possible disadvantages of this setting. Turn on
 # if you serve a lot of static content.
 
-# <IfModule mod_headers.c>
-#   Header set Connection Keep-Alive
-# </IfModule>
+<IfModule mod_headers.c>
+  Header set Connection Keep-Alive
+</IfModule>
 
 
 # ----------------------------------------------------------------------

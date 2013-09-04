@@ -1,0 +1,84 @@
+header
+	z-index: 50
+	position: fixed
+	background: none
+	width: 100%
+	.content
+		padding-top: 0px
+		position: relative
+		text-align: right
+
+		a
+			@include transition(color .5s, border .5s)
+			text-decoration: none
+			border-bottom-style: none
+
+		#logo-home, #logo-shadow
+			display: inline-block
+			position: absolute
+			left: 0px
+			top: 0px
+			left: 83px
+
+		#logo-home
+			top: 70px
+			z-index: 1
+
+		#logo-shadow
+			@include transition(all 0s)
+			opacity: .2
+			z-index: 0
+
+		.bt-menu
+			@include transition(color 800ms, padding 500ms, border 500ms)
+			display: inline
+			position: relative
+			margin-top: 20px
+			margin-left: 55px
+			color: #FFF
+			font-family: 'Electrolize', sans-serif
+			font-size: 16px
+			border-top: #000 solid 0px
+
+			&.inverted
+				color: #000
+
+		.bt-concept
+			margin-left: 190px
+
+		.bt-contact
+			// color: $colorContact
+			opacity: .5
+			// background-color: #000
+			padding: 1500px 5px 5px 5px
+			top: 20px
+			@include background(linear-gradient(45deg,  transparent 5px, #000 5px), linear-gradient(315deg, transparent 5px, #000 5px))
+			background-position: bottom left, bottom right
+			background-size: 50% 100%
+			background-repeat: no-repeat
+			&.inverted
+				color: #FFF
+		
+		.bt-menu.moving:hover
+			border-top: #FFF solid 1px
+			padding-top: 5px
+
+		.bt-concept:hover
+			color: $colorConcept
+
+		.bt-offer:hover
+			color: $colorOffer
+
+		.bt-references:hover
+			color: $colorReferences
+
+		.bt-blog:hover
+			color: $colorBlog
+			
+		.selected
+			color: $colorHome
+
+		.moving.selected:hover
+			border-top: none
+			color: $colorHome			
+

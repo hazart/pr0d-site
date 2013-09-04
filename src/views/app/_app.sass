@@ -1,14 +1,131 @@
+@import 'compass/css3'
+
+$colorHome: #00D9D9
+$colorConcept: #434960
+$colorOffer: #EB6B56
+$colorReferences: #0E7AC4
+$colorBlog: #FFF
+$colorContact: #000
+
+$columns: 10
+$column-width: 70px
+$gutter-width: 10px
+$max-width: $columns * ($column-width + $gutter-width)
+
+$font-base: 15px
+$font-base-line-height: 24px
+
+// FN
+@function em($target, $context: $font-base)
+	@if $target == 0
+		@return 0
+	@return $target / $context + 0em
+
+@function perc($width, $container-width: $max-width)
+	@return percentage($width / $container-width)
+
+// MIXINS
+
+@mixin col($n, $padding: 0px, $border: 0px, $container-width: $max-width)
+	float: left
+	margin-right: percentage($gutter-width / $container-width)
+	width:  percentage(($n * ($column-width + $gutter-width) - $gutter-width - ($padding * 2) - ($border * 2)) / $container-width)
+	border-width: $border
+	padding: em($padding, $font-base) percentage($padding / $container-width)
+
+@mixin calc($property, $expression)
+	#{$property}: -moz-calc(#{$expression})
+	#{$property}: -o-calc(#{$expression})
+	#{$property}: -webkit-calc(#{$expression})
+	#{$property}: calc(#{$expression})
+
 // Sass file for App View
 #total
-	width: 100%
-	height: 100%
-	overflow: hidden
+	// width: 100%
+	// height: 100%
 	background-color: #FFF
+	color: #FFF
+	font-family: 'Dosis'
 
-.test
-	background-color: #ABF
-	width: 100px
-	height: 100px
+.wrapper
+	// position: absolute
+	// margin: auto
+	// overflow: hidden
+
+.dummy
+	width: 100%
 	position: absolute
-	top: 10px
-	left: 10px
+	top: 0px
+
+.contents
+	z-index: 10
+	top: 800px
+	position: fixed
+	width: 100%
+
+.content
+	padding-top: 100px
+	width: 100%
+	// background-color: #F00
+	margin-left: auto
+	margin-right: auto
+	max-width: 800px
+	// @media (max-width: 800px)
+	// 	width: perc(800px)
+
+.strut
+	display: inline-block
+	vertical-align: middle
+	height: 100%	
+
+.pr0d-logo
+	position: relative
+	top: 50%
+	left: 50%
+	// margin-top: -25px
+	margin-left: -17px
+	background: url('/images/logo.png') -10px -70px no-repeat
+	height: 50px
+	width: 34px
+	@include transition(opacity 1s)
+	&.inverted
+		background: url('/images/logo-inverted.png') -10px -70px no-repeat
+	&.pr0d-logo:before
+		@include transition(opacity 1s)
+		content: ""
+		display: block
+		position: relative
+		background: url('/images/logo.png') -10px -130px no-repeat
+		left: -66px
+		height: 50px
+		width: 66px
+		opacity: 0
+	&.pr0d-logo.inverted:before
+		background: url('/images/logo-inverted.png') -10px -130px no-repeat
+	&.pr0d-logo:after
+		@include transition(opacity 1s)
+		content: ""
+		display: block
+		position: relative
+		background: url('/images/logo.png') -10px -10px no-repeat
+		top: -50px
+		left: 34px
+		height: 50px
+		width: 31px
+		opacity: 0
+	&.pr0d-logo.inverted:after
+		background: url('/images/logo-inverted.png') -10px -10px no-repeat
+	&.open
+		&.pr0d-logo:before
+			opacity: 1
+		&.pr0d-logo:after
+			opacity: 1
+
+a
+	text-decoration: none
+	border-bottom-width: 1px
+	border-bottom-style: dashed
+
+a:hover
+	border-bottom-width: 0px
+

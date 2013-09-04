@@ -1,0 +1,78 @@
+.home
+	z-index: 1
+	position: fixed
+	width: 100%
+	height: 1500px
+	// @include background(radial-gradient($colorHome, #35A4A8 1800px))
+	@include background(radial-gradient($colorHome, darken($colorHome, 5) 100%))
+	background-position: -250px -200px
+	color: #FFF
+	font-family: 'Electrolize', sans-serif
+	// background-image: url('/images/pattern.png')
+	.content
+		@include calc(height, "100% - 100px")
+
+		.intro
+			height: 220px
+			h1
+				margin-top: 10%
+				margin-left: 0px
+				position: relative
+				text-align: left
+				width: 100%
+				max-width: 640px
+				font-size: em(26px)
+				letter-spacing: 0.05em
+				font-weight: normal
+			h1:first-line
+				line-height: 2em
+			p.vous
+				font-size: 26px
+				margin-left: 0px
+				text-align: left
+
+		.inquire
+			display: block
+			width: 100%
+			@include calc(height, "100% - 360px")
+			.cell
+				@include transition(all 200ms)
+				display: inline-block
+				vertical-align: middle
+				padding: 5px
+				margin-bottom: 10px
+				cursor: pointer
+				@include calc(width, "50% - 15px")
+				@include calc(height, "33% - 20px")
+				float: left
+				text-align: center
+				overflow: hidden
+			.cell:nth-child(2n)
+				float: right
+			.label
+				display: inline-block
+				vertical-align: middle
+				position: relative
+
+			.level1
+				background-color: rgba(#0AF,.5)
+				.group
+					width: 100%
+					height: 100%
+					display: none
+				.level2
+					position: relative
+					display: inline-block
+					@include calc(height, "50% - 15px")
+					@include calc(width, "100% - 10px")
+					background-color: rgba(#000,.2)
+
+			.notselected
+				width: 0
+				height: 0
+				padding: 0
+				margin: 0
+			.selected
+				@include calc(width, "100% - 10px")
+				@include calc(height, "100% - 20px")
+

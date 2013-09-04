@@ -1,10 +1,22 @@
 lrSnippet = require('grunt-contrib-livereload/lib/utils').livereloadSnippet
+
+pushStateHook = (url) ->
+	path = require('path')
+	request = require('request');
+	return (req, res, next) ->
+		ext = path.extname(req.url)
+		if ((ext is "" or ext is ".html") && req.url != "/")
+			req.pipe(request(url)).pipe(res)
+		else
+			next()
+
 mountFolder = (connect, dir)->
 	return connect.static(require('path').resolve(dir))
 
 module.exports = (grunt)->
 
 	grunt.loadNpmTasks('grunt-contrib-livereload')
+	grunt.loadNpmTasks('grunt-contrib-watch')
 	grunt.loadNpmTasks('grunt-contrib-clean')
 	grunt.loadNpmTasks('grunt-contrib-coffee')
 	grunt.loadNpmTasks('grunt-contrib-compass')
@@ -17,10 +29,10 @@ module.exports = (grunt)->
 	grunt.loadNpmTasks('grunt-contrib-uglify')
 	grunt.loadNpmTasks('grunt-contrib-jade')
 	grunt.loadNpmTasks('grunt-requirejs')
-	grunt.loadNpmTasks('grunt-regarde')
 	grunt.loadNpmTasks('grunt-open')
 	grunt.loadNpmTasks('grunt-usemin')
-	grunt.loadNpmTasks('grunt-notify')	
+	grunt.loadNpmTasks('grunt-ftp-deploy')
+	grunt.loadNpmTasks('grunt-notify')
 
 	# configurable paths
 	yeomanConfig = {
@@ -35,7 +47,7 @@ module.exports = (grunt)->
 	try
 		yeomanConfig.app = require('./component.json').appPath || yeomanConfig.app
 	catch e
-	
+
 	#
 	# Grunt configuration:
 	#
@@ -46,19 +58,29 @@ module.exports = (grunt)->
 		# Project configuration
 		# ---------------------
 		yeoman: yeomanConfig
+
 		watch:
 			coffee:
 				files: ['<%= yeoman.src %>/{,**/}*.coffee']
-				tasks: ['coffee:dist']
-			
+				tasks: ['coffee:dev']
+				options: 
+					livereload: true
+					# interval: 500
+					spawn: false
+
 			compass:
 				files: ['<%= yeoman.src %>/{,**/}*.{scss,sass}']
-				tasks: ['compass:server']
-
+				tasks: ['compass:dev']
+				options: 
+					livereload: true
+			
 			jade:
 				files: ['<%= yeoman.src %>/views/{,**/}*.jade']
-				tasks: ['jade:server']
-			
+				tasks: ['jade:dev']
+				options: 
+					livereload: true
+					spawn: false
+
 			livereload:
 				files: [
 					'<%= yeoman.tmp %>/{,**/}*.{css,js,html}'
@@ -67,15 +89,15 @@ module.exports = (grunt)->
 					'<%= yeoman.app %>/js/{,**/}*.js'
 					'<%= yeoman.app %>/images/{,**/}*.{png,jpg,jpeg}'
 				]
-				
-				tasks: ['livereload']
+				options:
+					livereload: true
 
 		connect:
-			livereload:
+			dev:
 				options:
 					port: 9000
-					# Change this to '0.0.0.0' to access the server from outside.
-					hostname: 'localhost'
+					# Change this to 'localhost' to access the server only local.
+					hostname: '0.0.0.0'
 					middleware: (connect)->
 						return [
 							lrSnippet
@@ -85,15 +107,15 @@ module.exports = (grunt)->
 			dist:
 				options:
 					port: 9001
-					# Change this to '0.0.0.0' to access the server from outside.
-					hostname: 'localhost'
+					# Change this to 'localhost' to access the server only local.
+					hostname: '0.0.0.0'
 					middleware: (connect)->
 						return [
 							mountFolder(connect, yeomanConfig.dist)
 						]
 
 		open:
-			livereload:
+			dev:
 				path: 'http://localhost:<%= connect.livereload.options.port %>'
 			dist:
 				path: 'http://localhost:<%= connect.dist.options.port %>'
@@ -106,12 +128,24 @@ module.exports = (grunt)->
 			templates: ['<%= yeoman.dist %>/templates']
 
 		coffee:
-			dist:
+			dev:
 				expand: true
-				cwd: '<%= yeoman.src %>/'
+				cwd: '<%= yeoman.src %>'
 				src: ['**/*.coffee']
 				dest: '<%= yeoman.tmp %>/js'
 				ext: '.js'
+				options: 
+					runtime: 'inline',
+					sourceMap: true
+			dist:
+				expand: true
+				cwd: '<%= yeoman.src %>'
+				src: ['**/*.coffee']
+				dest: '<%= yeoman.tmp %>/js'
+				ext: '.js'
+				options: 
+					runtime: 'inline',
+					sourceMap: false
 
 		compass:
 			options:
@@ -123,31 +157,28 @@ module.exports = (grunt)->
 				importPath: ['<%= yeoman.app %>/components']
 				relativeAssets: true
 				# config: 'compass.rb'
-
+			dev:
+				options:
+					debugInfo: true
 			dist: 
 				options:
 					force: true
 					outputStyle: 'compressed'
 					environment: 'production'
-			server:
-				options:
-					debugInfo: true
-
-		# less:
-		# 	server:
-		# 		options:
-		# 			dumpLineNumbers: 'all'
-		# 		files:
-		# 		'<%= yeoman.tmp %>/css/all-less.css' : '<%= yeoman.app %>/components/bootstrap/less/{bootstrap,responsive}.less'
-
-		# 	dist:
-		# 		options:
-		# 			compress: true
-		# 			yuicompress: true
-		# 		files:
-		# 			'<%= yeoman.tmp %>/css/all-less.css' : '<%= yeoman.app %>/components/bootstrap/less/{bootstrap,responsive}.less'
 
 		jade: 
+			dev: 
+				options:
+					pretty: true
+					data:
+						debug: true
+				files: [
+					expand: true
+					cwd: '<%= yeoman.src %>/views'
+					src: ['**/*.jade']
+					dest: '<%= yeoman.tmp %>/templates'
+					ext: '.html'
+				]
 			dist: 
 				options:
 					pretty: true
@@ -160,24 +191,11 @@ module.exports = (grunt)->
 					dest: '<%= yeoman.tmp %>/templates'
 					ext: '.html'
 				]
-
-			server: 
-				options:
-					pretty: true
-					data:
-						debug: true
-				files: [
-					expand: true
-					cwd: '<%= yeoman.src %>/views'
-					src: ['**/*.jade']
-					dest: '<%= yeoman.tmp %>/templates'
-					ext: '.html'
-				]
 		copy:
 			dist:
 				files: [
-					{ expand: true, cwd: '<%= yeoman.tmp %>/', src: ['**'], dest: '<%= yeoman.tmp_dist %>/' }
-					{ expand: true, cwd: '<%= yeoman.app %>/', src: ['**'], dest: '<%= yeoman.tmp_dist %>/' }
+					{ expand: true, cwd: '<%= yeoman.tmp %>/', src: ['**','.*'], dest: '<%= yeoman.tmp_dist %>/' }
+					{ expand: true, cwd: '<%= yeoman.app %>/', src: ['**','.*'], dest: '<%= yeoman.tmp_dist %>/' }
 				]
 
 		useminPrepare:
@@ -200,6 +218,14 @@ module.exports = (grunt)->
 					dest: '<%= yeoman.dist %>/images'
 				}]
 
+		# cssmin: 
+		# 	minify: 
+		# 		expand: true,
+		# 		cwd: '<%= yeoman.dist %>/components/normalize/'
+		# 		src: ['*.css', '!*.min.css']
+		# 		dest: '<%= yeoman.tmp %>//css/'
+		# 		ext: '.min.css'
+
 		htmlmin:
 			dist:
 				# options:
@@ -212,7 +238,6 @@ module.exports = (grunt)->
 				#   useShortDoctype: true
 				#   removeEmptyAttributes: true
 				#   removeOptionalTags: true
-
 				files: [{
 					expand: true,
 					cwd: '<%= yeoman.app %>',
@@ -234,22 +259,40 @@ module.exports = (grunt)->
 					baseUrl: 'js/'
 					appDir: './<%= yeoman.tmp_dist %>/'
 					dir: './<%= yeoman.dist %>/'
-					
 					wrap: true
-
 					removeCombined: true
 					keepBuildDir: true
-
 					inlineText: true
 					mainConfigFile: '<%= yeoman.tmp_dist %>/js/main.js'
-
 					optimize: "uglify"
 
 					modules: [
 						{ name: 'vendors', exclude: [] }
 						{ name: 'app', exclude: ['vendors'] }
 						{ name: 'main', exclude: ['config', 'app', 'vendors'] }
+						{ name: 'views/home/home_view', exclude: ['config', 'app', 'vendors'] }
+						{ name: 'views/concept/concept_view', exclude: ['config', 'app', 'vendors'] }
+						{ name: 'views/offer/offer_view', exclude: ['config', 'app', 'vendors'] }
+						{ name: 'views/blog/blog_view', exclude: ['config', 'app', 'vendors'] }
 					]
+
+					done: (done, output) ->
+						duplicates = require('rjs-build-analysis').duplicates(output)
+						if (duplicates.length > 0)
+							grunt.log.subhead('Duplicates found in requirejs build:')
+							grunt.log.warn(duplicates)
+							done(new Error('r.js built duplicate modules, please check the excludes option.'))
+						done()
+
+		'ftp-deploy':
+			build:
+				auth:
+					host: 'FTP.hazart.o2switch.net'
+					port: 21
+					authKey: 'key'
+				src: 'dist'
+				dest: 'test/'
+				exclusions: ['dist/**/.DS_Store', 'dist/**/Thumbs.db', 'dist/build.txt']
 
 		notify: 
 			watch: 
@@ -259,18 +302,30 @@ module.exports = (grunt)->
 					
 			server: 
 				options:
-					message: 'Server is ready!'					
-	
-	grunt.renameTask('regarde', 'watch')
+					message: 'Server is ready!'	
+
+
+	grunt.event.on('watch', (action, filepath, target) ->
+		if (target is 'coffee' and grunt.file.isMatch( grunt.config('watch.coffee.files'), filepath))
+			grunt.config(['coffee', 'dev', 'src'], [filepath.replace(yeomanConfig.src+'/','')])
+
+		if (target is 'jade' and grunt.file.isMatch( grunt.config('watch.jade.files'), filepath))
+			fp = filepath.replace(yeomanConfig.src+'/views/','')
+			grunt.config(['jade', 'dev', 'files'], [
+					expand: true
+					cwd: '<%= yeoman.src %>/views'
+					src: [fp]
+					dest: '<%= yeoman.tmp %>/templates'
+					ext: '.html'
+				])
+	)
 
 	grunt.registerTask('server', [
-		'coffee:dist'
-		'compass:server'
-		# 'less:server'
-		'jade:server'
-		'livereload-start'
-		'connect:livereload'
-		# 'open:livereload'
+		'coffee:dev'
+		'compass:dev'
+		'jade:dev'
+		'connect:dev'
+		# 'open:dev'
 		'watch'
 		'notify:server'
 	])
@@ -282,10 +337,13 @@ module.exports = (grunt)->
 	])
 
 	grunt.registerTask('compile', [
-		'jade:server'
+		'jade:dist'
 		'coffee:dist'
-		'compass:server'
-		'less:dist'
+		'compass:dist'
+	])
+
+	grunt.registerTask('deploy', [
+		'ftp-deploy'
 	])
 
 	grunt.registerTask('build', [
@@ -293,9 +351,8 @@ module.exports = (grunt)->
 		'clean:tmp'
 		'clean:tmp_dist'
 		'jade:dist'
-		'coffee'
+		'coffee:dist'
 		'compass:dist'
-		# 'less:dist'
 		'copy:dist'
 		'requirejs:compile'
 		'useminPrepare'
@@ -311,4 +368,4 @@ module.exports = (grunt)->
 	])
 	grunt.option('force', true)
 
-	grunt.registerTask('default', ['server'])
+	grunt.registerTask('default', ['server'])	
