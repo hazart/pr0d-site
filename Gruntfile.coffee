@@ -19,7 +19,6 @@ module.exports = (grunt)->
 	grunt.loadNpmTasks('grunt-contrib-watch')
 	grunt.loadNpmTasks('grunt-contrib-clean')
 	grunt.loadNpmTasks('grunt-contrib-coffee')
-	grunt.loadNpmTasks('grunt-contrib-compass')
 	grunt.loadNpmTasks('grunt-contrib-concat')
 	grunt.loadNpmTasks('grunt-contrib-connect')
 	grunt.loadNpmTasks('grunt-contrib-copy')
@@ -28,11 +27,14 @@ module.exports = (grunt)->
 	grunt.loadNpmTasks('grunt-contrib-imagemin')
 	grunt.loadNpmTasks('grunt-contrib-uglify')
 	grunt.loadNpmTasks('grunt-contrib-jade')
+	grunt.loadNpmTasks('grunt-contrib-stylus')
 	grunt.loadNpmTasks('grunt-requirejs')
 	grunt.loadNpmTasks('grunt-open')
 	grunt.loadNpmTasks('grunt-usemin')
 	grunt.loadNpmTasks('grunt-ftp-deploy')
 	grunt.loadNpmTasks('grunt-notify')
+	grunt.loadNpmTasks('grunt-autoprefixer')
+	grunt.loadNpmTasks('grunt-text-replace')
 
 	# configurable paths
 	yeomanConfig = {
@@ -42,6 +44,12 @@ module.exports = (grunt)->
 
 		tmp: '.tmp'
 		tmp_dist: '.tmp-dist'
+
+		ftp_host: 'FTP.hazart.o2switch.net'
+		ftp_dest: '/'
+
+		ftp_host_preprod: 'FTP.hazart.o2switch.net'
+		ftp_dest_preprod: 'test/'
 	}
 
 	try
@@ -68,9 +76,9 @@ module.exports = (grunt)->
 					# interval: 500
 					spawn: false
 
-			compass:
-				files: ['<%= yeoman.src %>/{,**/}*.{scss,sass}']
-				tasks: ['compass:dev']
+			stylus:
+				files: ['<%= yeoman.src %>/{,**/}*.styl']
+				tasks: ['stylus:dev','autoprefixer']
 				options: 
 					livereload: true
 			
@@ -126,6 +134,8 @@ module.exports = (grunt)->
 			tmp_dist: ['<%= yeoman.tmp_dist %>']
 			components: ['<%= yeoman.dist %>/components']
 			templates: ['<%= yeoman.dist %>/templates']
+			css: ['<%= yeoman.dist %>/css/main.css']
+			js: ['<%= yeoman.dist %>/js/main.js']
 
 		coffee:
 			dev:
@@ -147,24 +157,29 @@ module.exports = (grunt)->
 					runtime: 'inline',
 					sourceMap: false
 
-		compass:
-			options:
-				sassDir: '<%= yeoman.src %>'
-				cssDir: '<%= yeoman.tmp %>/css'
-				imagesDir: '<%= yeoman.app %>/images'
-				javascriptsDir: '<%= yeoman.app %>/js'
-				fontsDir: './css/fonts'
-				importPath: ['<%= yeoman.app %>/components']
-				relativeAssets: true
-				# config: 'compass.rb'
+		stylus:
 			dev:
 				options:
-					debugInfo: true
-			dist: 
+					linenos: true
+					# firebug: true
+					compress: false
+					paths: ['<%= yeoman.src %>']
+					urlfunc: 'embedurl'
+					import: ['main.styl', 'helpers/stylus_mixin.styl']
+				files:
+					'<%= yeoman.tmp %>/css/main.css': '<%= yeoman.src %>/views/**/*.styl'
+			dist:
 				options:
-					force: true
-					outputStyle: 'compressed'
-					environment: 'production'
+					paths: ['<%= yeoman.src %>']
+					urlfunc: 'embedurl'
+					import: ['main.styl', 'helpers/stylus_mixin.styl']
+				files:
+					'<%= yeoman.tmp %>/css/main.css': '<%= yeoman.src %>/views/**/*.styl'
+
+		autoprefixer:
+			single_file:
+				src: '<%= yeoman.tmp %>/css/main.css',
+				dest: '<%= yeoman.tmp %>/css/main.css'
 
 		jade: 
 			dev: 
@@ -218,13 +233,13 @@ module.exports = (grunt)->
 					dest: '<%= yeoman.dist %>/images'
 				}]
 
-		# cssmin: 
-		# 	minify: 
-		# 		expand: true,
-		# 		cwd: '<%= yeoman.dist %>/components/normalize/'
-		# 		src: ['*.css', '!*.min.css']
-		# 		dest: '<%= yeoman.tmp %>//css/'
-		# 		ext: '.min.css'
+		cssmin: 
+			dist: 
+				expand: true,
+				cwd: '<%= yeoman.dist %>/css/'
+				src: ['*.css', '!*.min.css']
+				dest: '<%= yeoman.dist %>/css/'
+				ext: '.css'
 
 		htmlmin:
 			dist:
@@ -270,10 +285,12 @@ module.exports = (grunt)->
 						{ name: 'vendors', exclude: [] }
 						{ name: 'app', exclude: ['vendors'] }
 						{ name: 'main', exclude: ['config', 'app', 'vendors'] }
+						# view modules 
 						{ name: 'views/home/home_view', exclude: ['config', 'app', 'vendors'] }
 						{ name: 'views/concept/concept_view', exclude: ['config', 'app', 'vendors'] }
 						{ name: 'views/offer/offer_view', exclude: ['config', 'app', 'vendors'] }
 						{ name: 'views/blog/blog_view', exclude: ['config', 'app', 'vendors'] }
+						{ name: 'views/references/references_view', exclude: ['config', 'app', 'vendors'] }
 					]
 
 					done: (done, output) ->
@@ -284,26 +301,49 @@ module.exports = (grunt)->
 							done(new Error('r.js built duplicate modules, please check the excludes option.'))
 						done()
 
+		replace:
+			close:
+				src: ['<%= yeoman.dist %>/index.html']
+				overwrite: true
+				replacements: [{ 
+					from: 'flagClose: false'
+					to: 'flagClose: true' 
+				}]
+			nodev:
+				src: ['<%= yeoman.dist %>/index.html']
+				overwrite: true
+				replacements: [{ 
+					from: 'flagDev: true'
+					to: 'flagDev: false' 
+				}]
+
 		'ftp-deploy':
-			build:
+			prod:
 				auth:
-					host: 'FTP.hazart.o2switch.net'
+					host: '<%= yeoman.ftp_host %>'
 					port: 21
-					authKey: 'key'
+					authKey: 'prod'
 				src: 'dist'
-				dest: 'test/'
+				dest: '<%= yeoman.ftp_dest %>'
+				exclusions: ['dist/**/.DS_Store', 'dist/**/Thumbs.db', 'dist/build.txt']
+			preprod:
+				auth:
+					host: '<%= yeoman.ftp_host_preprod %>'
+					port: 21
+					authKey: 'preprod'
+				src: 'dist'
+				dest: '<%= yeoman.ftp_dest_preprod %>'
 				exclusions: ['dist/**/.DS_Store', 'dist/**/Thumbs.db', 'dist/build.txt']
 
 		notify: 
 			watch: 
 				options: 
 					title: 'Task Complete',  # optional
-					message: 'SASS and Uglify finished running', # required
+					message: 'Watch finished running', # required
 					
 			server: 
 				options:
 					message: 'Server is ready!'	
-
 
 	grunt.event.on('watch', (action, filepath, target) ->
 		if (target is 'coffee' and grunt.file.isMatch( grunt.config('watch.coffee.files'), filepath))
@@ -322,7 +362,8 @@ module.exports = (grunt)->
 
 	grunt.registerTask('server', [
 		'coffee:dev'
-		'compass:dev'
+		'stylus:dev'
+		'autoprefixer'
 		'jade:dev'
 		'connect:dev'
 		# 'open:dev'
@@ -339,11 +380,17 @@ module.exports = (grunt)->
 	grunt.registerTask('compile', [
 		'jade:dist'
 		'coffee:dist'
-		'compass:dist'
+		'stylus:dist'
 	])
 
 	grunt.registerTask('deploy', [
-		'ftp-deploy'
+		'replace:close'
+		'replace:nodev'
+		'ftp-deploy:prod'
+	])
+
+	grunt.registerTask('deploy-preprod', [
+		'ftp-deploy:preprod'
 	])
 
 	grunt.registerTask('build', [
@@ -352,16 +399,18 @@ module.exports = (grunt)->
 		'clean:tmp_dist'
 		'jade:dist'
 		'coffee:dist'
-		'compass:dist'
+		'stylus:dist'
 		'copy:dist'
-		'requirejs:compile'
 		'useminPrepare'
 		'imagemin'
-		'cssmin'
 		'htmlmin'
 		'concat'
 		'usemin'
+		'requirejs:compile'
 		'uglify'
+		'clean:css'
+		'cssmin'
+		'clean:js'
 		'clean:tmp_dist'
 		'clean:components'
 		'clean:templates'

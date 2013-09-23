@@ -2,7 +2,8 @@ define [
 	'backbone'
 	'underscore'
 	'text!templates/contact/contact.html'
-], (Backbone, _, tpl)->
+	'gsap'
+], (Backbone, _, tpl, gsap)->
 
 	class ContactView extends Backbone.View
 
@@ -11,7 +12,6 @@ define [
 		events: {}
 		
 		initialize: (options)->
-			console.log "ok"
 			@render()
 			
 		render: ->
