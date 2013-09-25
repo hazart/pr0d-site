@@ -12,6 +12,9 @@ requirejs.config
 			exports: 'Modernizr'
 		'gsap':
 			exports: 'TweenMax'
+		'jquery.cookie':
+			deps: ['jquery']
+			exports: '$'
 
 	paths:
 		'underscore': 	'../components/underscore/underscore'
@@ -22,6 +25,8 @@ requirejs.config
 		'modernizr':	'../components/modernizr/modernizr'
 		'gsap':		 	'../components/gsap/src/uncompressed/TweenMax'
 		'templates':	'../templates'
+
+		'jquery.cookie':'../components/jquery.cookie/jquery.cookie'
 
 		'config': 		'config/config_base'
 

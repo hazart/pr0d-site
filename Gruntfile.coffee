@@ -40,6 +40,7 @@ module.exports = (grunt)->
 	yeomanConfig = {
 		app: 'assets'
 		src: 'src'
+		filesrc: '/Volumes/Alex/Work/pr0d-site/src/'
 		dist: 'dist'
 
 		tmp: '.tmp'
@@ -147,6 +148,7 @@ module.exports = (grunt)->
 				options: 
 					runtime: 'inline',
 					sourceMap: true
+					# sourceRoot: '<%= yeoman.filesrc %>'
 			dist:
 				expand: true
 				cwd: '<%= yeoman.src %>'
