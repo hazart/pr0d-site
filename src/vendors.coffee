@@ -9,4 +9,6 @@ define [
 
 	'helpers/underscore_mixin'
 	'helpers/modernizr_test'
+
+	'jquery.cookie'
 ], ()->
