@@ -156,5 +156,6 @@ define [
 
 		onResize:=>
 			@updateHeight()
+			@twnContact = null
 
 	appView = new App()

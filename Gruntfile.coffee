@@ -35,6 +35,7 @@ module.exports = (grunt)->
 	grunt.loadNpmTasks('grunt-notify')
 	grunt.loadNpmTasks('grunt-autoprefixer')
 	grunt.loadNpmTasks('grunt-text-replace')
+	grunt.loadNpmTasks('grunt-escaped-seo')
 
 	# configurable paths
 	yeomanConfig = {
@@ -319,6 +320,26 @@ module.exports = (grunt)->
 					to: 'flagDev: false' 
 				}]
 
+		'escaped-seo':
+			preprod:
+				options:
+					domain: 'http://test.pr0d.fr'
+					server: 'http://localhost:9001'
+					public: 'dist'
+					folder: 'seo'
+					changefreq: 'daily'
+					delay: 2000
+					replace: {}
+			prod:
+				options:
+					domain: 'http://pr0d.fr'
+					server: 'http://localhost:9001'
+					public: 'dist'
+					folder: 'seo'
+					changefreq: 'daily'
+					delay: 2000
+					replace: {}
+
 		'ftp-deploy':
 			prod:
 				auth:
@@ -383,6 +404,11 @@ module.exports = (grunt)->
 		'jade:dist'
 		'coffee:dist'
 		'stylus:dist'
+	])
+
+	grunt.registerTask('seo-preprod', [
+		'connect:dist'
+		'escaped-seo:preprod'
 	])
 
 	grunt.registerTask('deploy', [

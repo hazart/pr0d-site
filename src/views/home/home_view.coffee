@@ -3,12 +3,14 @@ define [
 	'underscore'
 	'text!templates/home/home.html'
 	'config'
+	'views/common/ui/effect/crosslines'
 	'gsap'
-], (Backbone, _, tpl, Config, gsap)->
+], (Backbone, _, tpl, Config, Crosslines, gsap)->
 
 	class HomeView extends Backbone.View
 
 		el: ".home"
+		crosslines: null
 		
 		events: {
 			'mouseover .cell' : 'onCellOver'
@@ -19,6 +21,7 @@ define [
 
 		initialize: (options)->
 			@render()
+			Backbone.mediator.on 'currentPart', @onChangePart
 			
 		render: ->
 			@$el.html _.template( tpl, {Config: Config} )
@@ -45,8 +48,10 @@ define [
 				inquire.push(@$('p.advices'))
 			else
 				inquire.push(@$('.level1:nth-child(1)'),@$('.level1:nth-child(2)'),@$('.level1:nth-child(3)'),@$('.level1:nth-child(4)'),@$('.level1:nth-child(5)'),@$('.level1:nth-child(6)'))
-			
+
 			TweenMax.staggerTo(inquire, .3, {opacity:1, delay:0}, .2)
+			
+			@crosslines = new Crosslines(@$('.back'))
 
 		setProfil: (profil) ->
 
@@ -140,4 +145,10 @@ define [
 				@resetLevel2()
 				$('.cell').show()
 			e.preventDefault()
+
+		onChangePart: (part)=>
+			if part is "home"
+				@crosslines.on()
+			else
+				@crosslines.off()
 

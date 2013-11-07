@@ -7,18 +7,39 @@
 	opacity: 1
 	width: 100%
 	height: 500px
+	.district
+		z-index 1
+		opacity .3
+		position absolute
+		top 10px
+		left 0
+		width 100%
+		height 100%
+		height calc('100% - 20px')
+		background-image: url('/images/quartier.jpg')
+		background-size: cover
+		background-position: center
+	.district-over
+		z-index 2
+		opacity 1
+		position absolute
+		top 10px
+		left 0
+	.revelation
+		z-index 2
+		top 10px
+		position absolute
+
 	.content
-		position: absolute
-		margin: 10px 0 10px 0
-		padding: 0
-		width: 100%
-		height: 100%
-		.quartier
-			height calc('100% - 20px')
-			width: 100%
-			background-image: url('/images/quartier.jpg')
-			background-size: cover
-			background-position: center
+		z-index 3
+		position relative
+		margin-top 10px
+		margin-bottom 10px
+		// width 100%
+		// max-width 800px
+		// margin auto
+		// margin-top 10px
+		padding 0
 	// .mask
 	// 	position: absolute
 	// 	background-color: #000

@@ -1,6 +1,19 @@
 {
-  "name": "MyProject",
-  "version": "0.0.0",
+  "name": "Pr0d-site",
+  "version": "0.1.0",
+  "homepage": "",
+  "description": "Site",
+  "author": {
+    "name": "Alex Koch",
+    "email": "alexandre.koch@pr0d.fr"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hazart/pr0d-site.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hazart/pr0d-site/issues"
+  },
   "dependencies": {},
   "devDependencies": {
     "path": "~0.4.9",
@@ -24,7 +37,9 @@
     "grunt-usemin": "~0.1.10",
     "grunt-ftp-deploy": "~0.0.9",
     "grunt-text-replace": "~0.3.7",
-    "grunt-notify": ""
+    "grunt-text-replace": "~0.3.7",
+    "grunt-notify": "~0.2.16",
+    "grunt-escaped-seo": "~0.1.2"
   },
   "engines": {
     "node": ">=0.8.0"

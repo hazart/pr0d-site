@@ -18,6 +18,7 @@ define [
 			# 'click #logo-home' : 'onLogoClick'
 			'mouseover #logo-home' : 'onLogoOver'
 			'mouseout #logo-home' : 'onLogoOut'
+			'click .bt-contact' : 'checkContact'
 		}
 		
 		initialize: (options)->
@@ -32,7 +33,7 @@ define [
 
 		updatePosition: (pos) ->
 			dh = if ($(window).scrollTop() > $(window).height()-@hFooter) then 0 else $(window).height()-@hFooter-$(window).scrollTop()
-			dh = 0 if @currentPart is 'blog'
+			dh = 0 if @currentPart is 'blog' or $('.bt-contact').hasClass('inverted')
 
 			@$('.bt-menu.moving').css('top', dh + 20)
 			@$('#logo-shadow').css('top', dh + 5)
@@ -47,14 +48,46 @@ define [
 				@$('a').removeClass('inverted')
 			@updatePosition()
 
-		checkContact: ->
+		checkContact: (e)->
+			if e? and $(e.target).parents().index($('.contact')) is -1 and $(e.target).parents().index($(header)) is -1
+				if $('.bt-contact').hasClass('inverted')
+					Backbone.history.navigate('blog',{trigger:true})
+				else
+					$(window).scrollTop($(window).scrollTop()+1)
+					$(window).scrollTop($(window).scrollTop()-1)
+				return
+			else if e? and $(e.target).parents().index($(header)) is -1
+				return
+
+			flegOpen = true
 			if @currentPart is 'contact'
+				flagOpen = true
+				flagOpen = false if (e)
+			else
+				flagOpen = false
+
+			if flagOpen
 				unless @twnContact?
 					@twnContact = new TweenMax('.bt-contact',.6,{top:$(window).height()-@hFooter + 20})
 				else unless TweenMax.isTweening('.bt-contact') and !@twnContact.reversed()
 					@twnContact.play()
-			else 
+				@$('.bt-contact').css({color: "#000"})
+				$('.bt-contact').addClass('.selected')
+				$(document).bind('click', (e) => @checkContact(e))
+			else if @twnContact?
+				if @currentPart is 'contact'
+					if $('.bt-contact').hasClass('inverted')
+						Backbone.history.navigate('blog',{trigger:true})
+					else
+						$(window).scrollTop($(window).scrollTop()+1)
+						$(window).scrollTop($(window).scrollTop()-1)
+					e.stopPropagation()
+					e.preventDefault()
+					return
 				@twnContact.reverse() unless (parseInt(@$('.bt-contact').css('top')) is 20) or (TweenMax.isTweening('.bt-contact') and @twnContact.reversed())
+				@$('.bt-contact').css({color: "#FFF"})
+				$('.bt-contact').removeClass('.selected')
+				$(document).unbind('click')
 					
 		# Events
 		# onLogoClick: (e)->
@@ -77,4 +110,5 @@ define [
 				
 		onResize: (e) =>
 			@updatePosition()
+			@twnContact = null
 

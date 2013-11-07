@@ -29,10 +29,8 @@ define [
 			$('.steps',@ref.$('.bar')).append(@$el)
 
 		onRollOver: (e) ->
-			console.log 'over'
 
 		onRollOut: (e) ->
-			console.log 'out'
 
 		onClick: (e) ->
 			@ref.setPosition(@pos)

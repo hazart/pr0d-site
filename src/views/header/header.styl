@@ -47,15 +47,24 @@ header
 			margin-left: 190px
 
 		.bt-contact
-			// color: $colorContact
 			opacity: .5
-			// background-color: #000
 			padding: 1500px 5px 5px 5px
 			top: 20px
+			background-color: #000
 			background linear-gradient(45deg,  transparent 5px, #000 5px), linear-gradient(315deg, transparent 5px, #000 5px)
 			background-position: bottom left, bottom right
 			background-size: 50% 100%
 			background-repeat: no-repeat
+			&:hover
+				padding-bottom 15px
+			&.selected:after
+				content "x"
+				position absolute
+				top 1500px
+				left 30px
+				color #FFF
+			&.selected:hover:after
+				content "-"
 			&.inverted
 				color: #FFF
 		

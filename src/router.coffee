@@ -11,8 +11,7 @@ define [
 
 		routes:
 			'' 							: 'home'
-			'home' 						: 'home'
-			'home/:profil'	 			: 'home'
+			'/'							: 'home'
 			'concept' 					: 'concept'
 			'concept/:section' 			: 'concept'
 			'offre'			 			: 'offer'
@@ -27,7 +26,7 @@ define [
 			'*actions' 					: 'home'
 
 		refViews: [
-			{ route:'home' }
+			{ route:'' }
 		]
 
 		views : {}
@@ -121,7 +120,8 @@ define [
 			for i in [0..@refViews.length-1] by 1
 				if (i*100 <= pos < (i+1)*100)
 					if Backbone.history.getFragment() isnt @refViews[i].route
-						Backbone.history.navigate(@refViews[i].route,{trigger:true})
+						route = if @refViews[i].route is "" then "//" else @refViews[i].route
+						Backbone.history.navigate(route,{trigger:true})
 			@checkPreload(pos)
 
 		_trackPageview: (e)->
