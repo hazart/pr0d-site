@@ -16,5 +16,6 @@
     "commit": "6c6c6474cfac08506390527815a4a3b155b92747"
   },
   "_source": "git://github.com/greensock/GreenSock-JS.git",
-  "_target": "~1.10.1"
+  "_target": "~1.10.1",
+  "_originalSource": "git://github.com/greensock/GreenSock-JS.git"
 }

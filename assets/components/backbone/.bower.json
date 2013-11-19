@@ -9,5 +9,6 @@
     "commit": "836a8cb4d8744fcd71d6ca227dda051a4e5cb325"
   },
   "_source": "git://github.com/documentcloud/backbone.git",
-  "_target": "~0.9.10"
+  "_target": "~0.9.10",
+  "_originalSource": "git://github.com/documentcloud/backbone.git"
 }

@@ -9,5 +9,6 @@
     "commit": "484bdb43ec4a9dd6a40e60a2d25317bec7aeb43f"
   },
   "_source": "git://github.com/documentcloud/underscore.git",
-  "_target": "1.4.4"
+  "_target": "1.4.4",
+  "_originalSource": "git://github.com/documentcloud/underscore.git"
 }

@@ -9,5 +9,6 @@
     "commit": "bfbb3f01651455b702cd4949f9ec2d2f2521bb0f"
   },
   "_source": "git://github.com/requirejs/text.git",
-  "_target": "2.0.5"
+  "_target": "2.0.5",
+  "_originalSource": "git://github.com/requirejs/text"
 }

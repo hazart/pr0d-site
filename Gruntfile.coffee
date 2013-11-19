@@ -15,7 +15,6 @@ mountFolder = (connect, dir)->
 
 module.exports = (grunt)->
 
-	grunt.loadNpmTasks('grunt-contrib-livereload')
 	grunt.loadNpmTasks('grunt-contrib-watch')
 	grunt.loadNpmTasks('grunt-contrib-clean')
 	grunt.loadNpmTasks('grunt-contrib-coffee')
@@ -28,7 +27,7 @@ module.exports = (grunt)->
 	grunt.loadNpmTasks('grunt-contrib-uglify')
 	grunt.loadNpmTasks('grunt-contrib-jade')
 	grunt.loadNpmTasks('grunt-contrib-stylus')
-	grunt.loadNpmTasks('grunt-requirejs')
+	grunt.loadNpmTasks('grunt-contrib-requirejs')
 	grunt.loadNpmTasks('grunt-open')
 	grunt.loadNpmTasks('grunt-usemin')
 	grunt.loadNpmTasks('grunt-ftp-deploy')
@@ -41,11 +40,13 @@ module.exports = (grunt)->
 	yeomanConfig = {
 		app: 'assets'
 		src: 'src'
-		filesrc: '/Volumes/Alex/Work/pr0d-site/src/'
 		dist: 'dist'
 
 		tmp: '.tmp'
 		tmp_dist: '.tmp-dist'
+
+		domain: 'pr0d.fr'
+		domain_preprod: 'test.pr0d.fr'
 
 		ftp_host: 'FTP.hazart.o2switch.net'
 		ftp_dest: '/'
@@ -148,8 +149,8 @@ module.exports = (grunt)->
 				ext: '.js'
 				options: 
 					runtime: 'inline',
-					sourceMap: true
-					# sourceRoot: '<%= yeoman.filesrc %>'
+					sourceMap: true,
+					sourceMapDir: '<%= yeoman.src %>'
 			dist:
 				expand: true
 				cwd: '<%= yeoman.src %>'
@@ -282,7 +283,7 @@ module.exports = (grunt)->
 					keepBuildDir: true
 					inlineText: true
 					mainConfigFile: '<%= yeoman.tmp_dist %>/js/main.js'
-					optimize: "uglify"
+					optimize: ""
 
 					modules: [
 						{ name: 'vendors', exclude: [] }
@@ -323,7 +324,7 @@ module.exports = (grunt)->
 		'escaped-seo':
 			preprod:
 				options:
-					domain: 'http://test.pr0d.fr'
+					domain: '<%= yeoman.domain_preprod %>'
 					server: 'http://localhost:9001'
 					public: 'dist'
 					folder: 'seo'
@@ -332,7 +333,7 @@ module.exports = (grunt)->
 					replace: {}
 			prod:
 				options:
-					domain: 'http://pr0d.fr'
+					domain: '<%= yeoman.domain %>'
 					server: 'http://localhost:9001'
 					public: 'dist'
 					folder: 'seo'
@@ -397,13 +398,18 @@ module.exports = (grunt)->
 	grunt.registerTask('server-dist', [
 		'connect:dist'
 		'open:dist'
-		'watch:livereload'
+		'watch'
 	])
 
 	grunt.registerTask('compile', [
 		'jade:dist'
 		'coffee:dist'
 		'stylus:dist'
+	])
+
+	grunt.registerTask('seo', [
+		'connect:dist'
+		'escaped-seo:prod'
 	])
 
 	grunt.registerTask('seo-preprod', [
@@ -435,13 +441,13 @@ module.exports = (grunt)->
 		'concat'
 		'usemin'
 		'requirejs:compile'
-		'uglify'
 		'clean:css'
 		'cssmin'
 		'clean:js'
 		'clean:tmp_dist'
 		'clean:components'
 		'clean:templates'
+		'uglify'
 	])
 	grunt.option('force', true)
 

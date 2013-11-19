@@ -27,6 +27,7 @@ define [
 			@$el.html _.template( tpl, {Config: Config} )
 
 			directAdvices = false
+
 			if $.cookie('homeChoice')
 				lvl1 = $.cookie('homeChoice').split('+')[0]
 				lvl2 = $.cookie('homeChoice').split('+')[1]
@@ -34,6 +35,7 @@ define [
 				@$('.cell[level=1]').addClass('notselected')
 				@$('.level1:nth-child('+lvl1+')').removeClass('notselected')
 				@$('.level1:nth-child('+lvl1+')').addClass('selected')
+
 				@setLevel1()
 
 				if lvl2?
@@ -51,7 +53,11 @@ define [
 
 			TweenMax.staggerTo(inquire, .3, {opacity:1, delay:0}, .2)
 			
-			@crosslines = new Crosslines(@$('.back'))
+			setTimeout(
+				() =>
+					@crosslines = new Crosslines(@$('.back'))
+				5000
+				)
 
 		setProfil: (profil) ->
 
