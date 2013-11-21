@@ -21,6 +21,7 @@ define [
 
 		initialize: (options)->
 			@render()
+
 			Backbone.mediator.on 'currentPart', @onChangePart
 			
 		render: ->

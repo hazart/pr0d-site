@@ -10,16 +10,28 @@
 #   Sample .htaccess file of CMS MODx: modxcms.com
 
 # ----------------------------------------------------------------------
-# Backbone Pushstate
+# SEO Google escaped fragment
 # ----------------------------------------------------------------------
 
 <ifModule mod_rewrite.c>
     RewriteEngine On
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} !index
-    RewriteRule !\.(js|ico|gif|jpg|png|css)$ index.html [L]
+    RewriteCond %{QUERY_STRING} ^_escaped_fragment_=$
+    RewriteRule ^$ /seo/index.html [QSA,L]
+    RewriteCond %{QUERY_STRING} ^_escaped_fragment_=(.*)$
+    RewriteRule ^$ /seo/%1.html [QSA,L]
 </ifModule>
+
+# ----------------------------------------------------------------------
+# Backbone Pushstate
+# ----------------------------------------------------------------------
+
+# <ifModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteCond %{REQUEST_FILENAME} !-f
+#     RewriteCond %{REQUEST_FILENAME} !-d
+#     RewriteCond %{REQUEST_URI} !index
+#     RewriteRule !\.(js|ico|gif|jpg|png|css)$ index.html [L]
+# </ifModule>
 
 # ----------------------------------------------------------------------
 # Better website experience for IE users

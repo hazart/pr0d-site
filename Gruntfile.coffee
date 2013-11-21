@@ -1,5 +1,3 @@
-lrSnippet = require('grunt-contrib-livereload/lib/utils').livereloadSnippet
-
 pushStateHook = (url) ->
 	path = require('path')
 	request = require('request');
@@ -14,7 +12,6 @@ mountFolder = (connect, dir)->
 	return connect.static(require('path').resolve(dir))
 
 module.exports = (grunt)->
-
 	grunt.loadNpmTasks('grunt-contrib-watch')
 	grunt.loadNpmTasks('grunt-contrib-clean')
 	grunt.loadNpmTasks('grunt-contrib-coffee')
@@ -54,10 +51,6 @@ module.exports = (grunt)->
 		ftp_host_preprod: 'FTP.hazart.o2switch.net'
 		ftp_dest_preprod: 'test/'
 	}
-
-	try
-		yeomanConfig.app = require('./component.json').appPath || yeomanConfig.app
-	catch e
 
 	#
 	# Grunt configuration:
@@ -111,7 +104,7 @@ module.exports = (grunt)->
 					hostname: '0.0.0.0'
 					middleware: (connect)->
 						return [
-							lrSnippet
+							require('connect-livereload')()
 							mountFolder(connect, yeomanConfig.tmp)
 							mountFolder(connect, yeomanConfig.app)
 						]
@@ -150,6 +143,7 @@ module.exports = (grunt)->
 				options: 
 					runtime: 'inline',
 					sourceMap: true,
+					sourceRoot: '<%= yeoman.src %>'
 					sourceMapDir: '<%= yeoman.src %>'
 			dist:
 				expand: true
@@ -266,10 +260,12 @@ module.exports = (grunt)->
 
 		uglify:
 			dist:
-				files:
-					'<%= yeoman.dist %>/js/all.js': [
-						'<%= yeoman.dist %>/js/all.js'
-					]
+				files:[{
+					expand: true,
+					cwd: '<%= yeoman.dist %>',
+					src: '**/*.js',
+					dest: '<%= yeoman.dist %>'
+				}]
 
 		requirejs:
 			compile:
