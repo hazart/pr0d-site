@@ -45,7 +45,13 @@ define [
 				@lockUpdateRoute = value
 			@bind 'route', @_trackPageview
 			# Pour utiliser pushstate il faudrait que requirejs génère des balises scripts avec des sources en /
-			Backbone.history.start( {pushState: false} )
+			Backbone.history.start( {pushState: true} )
+			$(document).on 'click', 'a:not([data-bypass])', (evt) =>
+				href = $(evt.currentTarget).attr('href');
+				protocol = this.protocol + '//';
+				if (href.slice(protocol.length) != protocol)
+					evt.preventDefault();
+					@navigate(href, true);
 
 		home: (profil)->
 			# console.log 'HOME'

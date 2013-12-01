@@ -141,8 +141,8 @@ module.exports = (grunt)->
 				dest: '<%= yeoman.tmp %>/js'
 				ext: '.js'
 				options: 
-					runtime: 'inline',
-					sourceMap: true,
+					runtime: 'inline'
+					sourceMap: true
 					sourceRoot: '<%= yeoman.src %>'
 					sourceMapDir: '<%= yeoman.src %>'
 			dist:
@@ -152,7 +152,7 @@ module.exports = (grunt)->
 				dest: '<%= yeoman.tmp %>/js'
 				ext: '.js'
 				options: 
-					runtime: 'inline',
+					runtime: 'inline'
 					sourceMap: false
 
 		stylus:
@@ -160,6 +160,7 @@ module.exports = (grunt)->
 				options:
 					linenos: true
 					# firebug: true
+					sourcemaps: true
 					compress: false
 					paths: ['<%= yeoman.src %>']
 					urlfunc: 'embedurl'

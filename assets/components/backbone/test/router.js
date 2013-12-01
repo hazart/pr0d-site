@@ -1,4 +1,4 @@
-$(document).ready(function() {
+(function() {
 
   var router = null;
   var location = null;
@@ -57,6 +57,15 @@ $(document).ready(function() {
 
   });
 
+  var ExternalObject = {
+    value: 'unset',
+
+    routingFunction: function(value) {
+      this.value = value;
+    }
+  };
+  _.bindAll(ExternalObject);
+
   var Router = Backbone.Router.extend({
 
     count: 0,
@@ -66,6 +75,8 @@ $(document).ready(function() {
       "counter":                    "counter",
       "search/:query":              "search",
       "search/:query/p:page":       "search",
+      "charñ":                      "charUTF",
+      "char%C3%B1":                 "charEscaped",
       "contacts":                   "contacts",
       "contacts/new":               "newContact",
       "contacts/:id":               "loadContact",
@@ -73,8 +84,11 @@ $(document).ready(function() {
       "optional(/:item)":           "optionalItem",
       "named/optional/(y:z)":       "namedOptional",
       "splat/*args/end":            "splat",
-      "*first/complex-:part/*rest": "complex",
+      ":repo/compare/*from...*to":  "github",
+      "decode/:named/*splat":       "decode",
+      "*first/complex-*part/*rest": "complex",
       ":entity?*args":              "query",
+      "function/:value":            ExternalObject.routingFunction,
       "*anything":                  "anything"
     },
 
@@ -91,9 +105,17 @@ $(document).ready(function() {
       this.count++;
     },
 
-    search : function(query, page) {
+    search: function(query, page) {
       this.query = query;
       this.page = page;
+    },
+
+    charUTF: function() {
+      this.charType = 'UTF';
+    },
+
+    charEscaped: function() {
+      this.charType = 'escaped';
     },
 
     contacts: function(){
@@ -116,6 +138,12 @@ $(document).ready(function() {
       this.args = args;
     },
 
+    github: function(repo, from, to) {
+      this.repo = repo;
+      this.from = from;
+      this.to = to;
+    },
+
     complex: function(first, part, rest) {
       this.first = first;
       this.part = part;
@@ -133,6 +161,11 @@ $(document).ready(function() {
 
     namedOptional: function(z) {
       this.z = z;
+    },
+
+    decode: function(named, path) {
+      this.named = named;
+      this.path = path;
     },
 
     routeEvent: function(arg) {
@@ -153,6 +186,15 @@ $(document).ready(function() {
     equal(lastArgs[0], 'news');
   });
 
+  test("routes (simple, but unicode)", 4, function() {
+    location.replace('http://example.com#search/тест');
+    Backbone.history.checkUrl();
+    equal(router.query, "тест");
+    equal(router.page, void 0);
+    equal(lastRoute, 'search');
+    equal(lastArgs[0], "тест");
+  });
+
   test("routes (two part)", 2, function() {
     location.replace('http://example.com#search/nyc/p10');
     Backbone.history.checkUrl();
@@ -170,6 +212,10 @@ $(document).ready(function() {
     Backbone.history.navigate('search/manhattan/p20', true);
     equal(router.query, 'manhattan');
     equal(router.page, '20');
+  });
+
+  test("reports matched route via nagivate", 1, function() {
+    ok(Backbone.history.navigate('search/manhattan/p20', true));
   });
 
   test("route precedence via navigate", 6, function(){
@@ -213,6 +259,14 @@ $(document).ready(function() {
     equal(router.args, 'long-list/of/splatted_99args');
   });
 
+  test("routes (github)", 3, function() {
+    location.replace('http://example.com#backbone/compare/1.0...braddunbar:with/slash');
+    Backbone.history.checkUrl();
+    equal(router.repo, 'backbone');
+    equal(router.from, '1.0');
+    equal(router.to, 'braddunbar:with/slash');
+  });
+
   test("routes (optional)", 2, function() {
     location.replace('http://example.com#optional');
     Backbone.history.checkUrl();
@@ -246,6 +300,23 @@ $(document).ready(function() {
     equal(router.anything, 'doesnt-match-a-route');
   });
 
+  test("routes (function)", 3, function() {
+    router.on('route', function(name) {
+      ok(name === '');
+    });
+    equal(ExternalObject.value, 'unset');
+    location.replace('http://example.com#function/set');
+    Backbone.history.checkUrl();
+    equal(ExternalObject.value, 'set');
+  });
+
+  test("Decode named parameters, not splats.", 2, function() {
+    location.replace('http://example.com#decode/a%2Fb/c%2Fd/e');
+    Backbone.history.checkUrl();
+    strictEqual(router.named, 'a/b');
+    strictEqual(router.path, 'c/d/e');
+  });
+
   test("fires event when router doesn't have callback on it", 1, function() {
     router.on("route:noCallback", function(){ ok(true); });
     location.replace('http://example.com#noCallback');
@@ -277,9 +348,9 @@ $(document).ready(function() {
   test("#967 - Route callback gets passed encoded values.", 3, function() {
     var route = 'has%2Fslash/complex-has%23hash/has%20space';
     Backbone.history.navigate(route, {trigger: true});
-    strictEqual(router.first, 'has%2Fslash');
-    strictEqual(router.part, 'has%23hash');
-    strictEqual(router.rest, 'has%20space');
+    strictEqual(router.first, 'has/slash');
+    strictEqual(router.part, 'has#hash');
+    strictEqual(router.rest, 'has space');
   });
 
   test("correctly handles URLs with % (#868)", 3, function() {
@@ -290,6 +361,13 @@ $(document).ready(function() {
     equal(router.query, 'fat');
     equal(router.page, void 0);
     equal(lastRoute, 'search');
+  });
+
+  test("#2666 - Hashes with UTF8 in them.", 2, function() {
+    Backbone.history.navigate('charñ', {trigger: true});
+    equal(router.charType, 'UTF');
+    Backbone.history.navigate('char%C3%B1', {trigger: true});
+    equal(router.charType, 'escaped');
   });
 
   test("#1185 - Use pathname when hashChange is not wanted.", 1, function() {
@@ -529,4 +607,123 @@ $(document).ready(function() {
     Backbone.history.checkUrl();
   });
 
-});
+  test("#2255 - Extend routes by making routes a function.", 1, function() {
+    var RouterBase = Backbone.Router.extend({
+      routes: function() {
+        return {
+          home:  "root",
+          index: "index.html"
+        };
+      }
+    });
+
+    var RouterExtended = RouterBase.extend({
+      routes: function() {
+        var _super = RouterExtended.__super__.routes;
+        return _.extend(_super(),
+          { show:   "show",
+            search: "search" });
+      }
+    });
+
+    var router = new RouterExtended();
+    deepEqual({home: "root", index: "index.html", show: "show", search: "search"}, router.routes);
+  });
+
+  test("#2538 - hashChange to pushState only if both requested.", 0, function() {
+    Backbone.history.stop();
+    location.replace('http://example.com/root?a=b#x/y');
+    Backbone.history = _.extend(new Backbone.History, {
+      location: location,
+      history: {
+        pushState: function(){},
+        replaceState: function(){ ok(false); }
+      }
+    });
+    Backbone.history.start({
+      root: 'root',
+      pushState: true,
+      hashChange: false
+    });
+  });
+
+  test('No hash fallback.', 0, function() {
+    Backbone.history.stop();
+    Backbone.history = _.extend(new Backbone.History, {
+      location: location,
+      history: {
+        pushState: function(){},
+        replaceState: function(){}
+      }
+    });
+
+    var Router = Backbone.Router.extend({
+      routes: {
+        hash: function() { ok(false); }
+      }
+    });
+    var router = new Router;
+
+    location.replace('http://example.com/');
+    Backbone.history.start({
+      pushState: true,
+      hashChange: false
+    });
+    location.replace('http://example.com/nomatch#hash');
+    Backbone.history.checkUrl();
+  });
+
+  test('#2656 - No trailing slash on root.', 1, function() {
+    Backbone.history.stop();
+    Backbone.history = _.extend(new Backbone.History, {
+      location: location,
+      history: {
+        pushState: function(state, title, url){
+          strictEqual(url, '/root');
+        }
+      }
+    });
+    location.replace('http://example.com/root/path');
+    Backbone.history.start({pushState: true, root: 'root'});
+    Backbone.history.navigate('');
+  });
+
+  test('#2656 - No trailing slash on root.', 1, function() {
+    Backbone.history.stop();
+    Backbone.history = _.extend(new Backbone.History, {
+      location: location,
+      history: {
+        pushState: function(state, title, url) {
+          strictEqual(url, '/');
+        }
+      }
+    });
+    location.replace('http://example.com/path');
+    Backbone.history.start({pushState: true});
+    Backbone.history.navigate('');
+  });
+
+  test('#2765 - Fragment matching sans query/hash.', 2, function() {
+    Backbone.history.stop();
+    Backbone.history = _.extend(new Backbone.History, {
+      location: location,
+      history: {
+        pushState: function(state, title, url) {
+          strictEqual(url, '/path?query#hash');
+        }
+      }
+    });
+
+    var Router = Backbone.Router.extend({
+      routes: {
+        path: function() { ok(true); }
+      }
+    });
+    var router = new Router;
+
+    location.replace('http://example.com/');
+    Backbone.history.start({pushState: true});
+    Backbone.history.navigate('path?query#hash', true);
+  });
+
+})();

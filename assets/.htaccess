@@ -21,17 +21,22 @@
     RewriteRule ^$ /seo/%1.html [QSA,L]
 </ifModule>
 
+
 # ----------------------------------------------------------------------
 # Backbone Pushstate
 # ----------------------------------------------------------------------
 
-# <ifModule mod_rewrite.c>
-#     RewriteEngine On
-#     RewriteCond %{REQUEST_FILENAME} !-f
-#     RewriteCond %{REQUEST_FILENAME} !-d
-#     RewriteCond %{REQUEST_URI} !index
-#     RewriteRule !\.(js|ico|gif|jpg|png|css)$ index.html [L]
-# </ifModule>
+<ifModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !index
+    RewriteRule !\.(js|ico|gif|jpg|png|css)$ index.html [L]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule /?(js/.*)$   /$1 [L]
+</ifModule>
 
 # ----------------------------------------------------------------------
 # Better website experience for IE users

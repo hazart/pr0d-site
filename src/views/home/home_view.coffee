@@ -21,7 +21,6 @@ define [
 
 		initialize: (options)->
 			@render()
-
 			Backbone.mediator.on 'currentPart', @onChangePart
 			
 		render: ->
@@ -155,7 +154,7 @@ define [
 
 		onChangePart: (part)=>
 			if part is "home"
-				@crosslines.on()
+				@crosslines?.on()
 			else
-				@crosslines.off()
+				@crosslines?.off()
 
