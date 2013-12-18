@@ -3,14 +3,15 @@ define [
 	'underscore'
 	'config'
 	'text!templates/app/app.html'
+	'css!templates/app/app.css'
 	'gsap'
 	'views/header/header_view'	
 	'views/contact/contact_view'	
 	'gsap'
-], (Backbone, _, Config, tpl, gsap, Header, Contact, Gsap)->
+], (Backbone, _, Config, tpl, css, gsap, Header, Contact, Gsap)->
 
 	class App extends Backbone.View
-		
+
 		el: "#total"
 		
 		events: {

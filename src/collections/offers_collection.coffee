@@ -15,5 +15,9 @@ define [
 				new Offer({title: 'Architecture technique ou réalisation de prototypes', url: 'offre/architecture'})
 				new Offer({title: 'Technologies et supports', url: 'offre/technos'})
 			])		
+
+		getTitleBySection: (section) ->
+			c = @where({url:"concept/"+section})[0]
+			return c.get("title")			
 		
 	Offers = new OffersCollection()

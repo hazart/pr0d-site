@@ -10,8 +10,7 @@ define [
 	class Router extends Backbone.Router
 
 		routes:
-			'' 							: 'home'
-			'/'							: 'home'
+			'/' 							: 'home'
 			'concept' 					: 'concept'
 			'concept/:section' 			: 'concept'
 			'offre'			 			: 'offer'
@@ -26,16 +25,17 @@ define [
 			'*actions' 					: 'home'
 
 		refViews: [
-			{ route:'' }
+			{ route:'/' }
 		]
 
 		views : {}
 
 		lockUpdateRoute: false
 
+		baseTitle: "PR0D"
+
 		initialize: ()->
 			appView.render()
-
 			@refViews.push {route: concept.get('url')} for concept in Concepts.toArray()
 			@refViews.push {route: offer.get('url')} for offer in Offers.toArray()
 			@refViews.push {route: 'references'}
@@ -59,6 +59,7 @@ define [
 				@.setProfil(profil) if (profil)
 			Backbone.mediator.trigger('currentPart', 'home')
 			@checkPos()
+			document.title = @baseTitle + " - Production digitale"
 
 		concept: (section)->
 			# console.log 'CONCEPT '+ section
@@ -66,6 +67,8 @@ define [
 				@.setSection(section) if (section)
 			Backbone.mediator.trigger('currentPart', 'concept')
 			@checkPos()
+			document.title = @baseTitle + " - Concept"
+			document.title += " - " + Concepts.getTitleBySection(section) if section
 
 		offer: (section)->
 			# console.log 'OFFER '+ section
@@ -73,6 +76,7 @@ define [
 				@.setSection(section) if (section)
 			Backbone.mediator.trigger('currentPart', 'offer')
 			@checkPos()
+			document.title = @baseTitle + " - Offre"
 
 		references: (filtre, id)->
 			# console.log 'REFERENCES : ' + filtre + ' : ' + id
@@ -81,10 +85,12 @@ define [
 				@.setId(id) if (id)
 			Backbone.mediator.trigger('currentPart', 'references')
 			@checkPos()
+			document.title = @baseTitle + " - Références"
 
 		blog: (tags, name)->
 			# console.log 'BLOG : ' + tags + ' : ' + name
-			@goto view: 'views/blog/blog_view'
+			@goto view: 'views/blog/blog_view', callback: (view)->
+				document.title = @baseTitle + " - Références"
 			Backbone.mediator.trigger('currentPart', 'blog')
 			appView.checkContact()
 			appView.checkBlog()
@@ -115,6 +121,7 @@ define [
 
 		checkPos: ()->
 			current = Backbone.history.getFragment()
+			current = '/' if current is ''
 			appView.checkContact()
 			appView.checkBlog()
 			for i in [0..@refViews.length-1] by 1

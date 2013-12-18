@@ -2,7 +2,7 @@ define [
 	'backbone'
 	'models/concept_model'
 ], (Backbone, Concept)->
-	
+
 	class ConceptsCollection extends Backbone.Collection
 		
 		model: Concept
@@ -19,6 +19,10 @@ define [
 				new Concept({title: 'Mise en place de process', url: 'concept/process'})
 			])
 
+		getTitleBySection: (section) ->
+			c = @where({url:"concept/"+section})[0]
+			return c.get("title")
+			
 
 	Concepts = new ConceptsCollection()
 		

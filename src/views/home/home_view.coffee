@@ -2,10 +2,11 @@ define [
 	'backbone'
 	'underscore'
 	'text!templates/home/home.html'
+	'css!templates/home/home.css'
 	'config'
 	'views/common/ui/effect/crosslines'
 	'gsap'
-], (Backbone, _, tpl, Config, Crosslines, gsap)->
+], (Backbone, _, tpl, css, Config, Crosslines, gsap)->
 
 	class HomeView extends Backbone.View
 

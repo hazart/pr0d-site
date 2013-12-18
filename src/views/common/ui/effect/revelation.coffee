@@ -32,6 +32,7 @@ define [
 		constructor: (target, srcImage) ->
 			@target = target
 			@srcImage = srcImage
+			return unless @target
 		
 			target.after('<canvas class="revelation revelation-mask"></canvas>')
 			target.after('<canvas class="revelation revelation-copy" style="opacity: 0"></canvas>')
@@ -41,6 +42,7 @@ define [
 
 			@ctxCopy = @canvasCopy[0].getContext('2d')
 			@ctxMask = @canvasMask[0].getContext('2d')
+
 
 			$(window).bind 'resize',@onResize
 
@@ -79,6 +81,8 @@ define [
 				sh = sw * @h / @w
 				sx = 0
 				sy = (@img.height - sh)/2
+
+			return if @w is 0 or @h is 0 or sw is 0 or sh is 0
 
 			@ctxCopy.drawImage(@img, sx, sy, sw, sh, 0, 0, @w, @h)
 			@imageDataCopy = @ctxCopy.getImageData(0, 0, @w, @h)
@@ -134,6 +138,7 @@ define [
 		onResize:=>
 			@w = @target.width()
 			@h = @target.height()
+			return if $('.revelation').length < 1
 			$('.revelation').attr('width',@w)
 			$('.revelation').attr('height',@h)
 			@createCopy()

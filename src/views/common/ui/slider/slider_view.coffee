@@ -2,8 +2,9 @@ define [
 	'backbone'
 	'underscore'
 	'text!templates/common/ui/slider/slider.html'
+	'css!templates/common/ui/slider/slider.css'
 	'views/common/ui/slider/slider-step'
-], (Backbone, _, tpl, SliderStep)->
+], (Backbone, _, tpl, css, SliderStep)->
 
 	class CommonUiSliderSliderView extends Backbone.View
 

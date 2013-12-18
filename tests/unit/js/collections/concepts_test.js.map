@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "concepts_test.js",
+  "sourceRoot": "../../src/collections/",
+  "sources": [
+    "concepts_test.coffee"
+  ],
+  "names": [],
+  "mappings": "AAAA;CAAA,CAAA,CAEG,GAFH,EAEG,CAAC,wBAFG;CAGG,CAAuB,CAAA,KAAhC,CAAgC,EAAhC,UAAA;CACC,CAAA,CAA6B,GAA7B,GAA6B,eAA7B;CACU,CAAa,CAAH,GAAJ,EAAP,OAAR;CADD,MAA6B;CAI1B,CAAH,CAAsB,MAAA,IAAtB,IAAA;CACU,CAAgB,GAAzB,CAAe,EAAP,OAAR;CADD,MAAsB;CALvB,IAAgC;CAHjC,EAEG;CAFH"
+}

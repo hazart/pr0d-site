@@ -2,7 +2,8 @@ define [
 	'backbone'
 	'underscore'
 	'text!templates/header/header.html'
-], (Backbone, _, tpl)->
+	'css!templates/header/header.css'
+], (Backbone, _, tpl, css)->
 
 	class HeaderView extends Backbone.View
 

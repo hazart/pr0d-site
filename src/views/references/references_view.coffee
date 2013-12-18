@@ -2,7 +2,8 @@ define [
 	'backbone'
 	'underscore'
 	'text!templates/references/references.html'
-], (Backbone, _, tpl)->
+	'css!templates/references/references.css'
+], (Backbone, _, tpl, css)->
 
 	class ReferencesView extends Backbone.View
 

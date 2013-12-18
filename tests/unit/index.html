@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Unit test</title>
+		<link rel="stylesheet" href="/components/mocha/mocha.css">
+		<script>
+			window.isTest = true;
+		</script>
+		<script src="/components/mocha/mocha.js"></script>
+		<script>
+			mocha.setup('bdd')
+		</script>
+		<script src="/components/chai/chai.js"></script>
+		<script>
+			expect = window.expect = chai.expect;
+			chai.should();
+		</script>
+		<script src="/components/underscore/underscore.js"></script>
+		<script src="/components/jquery/jquery.js"></script>
+		<script src="/components/requirejs/require.js"></script>
+		<script src="/js/config/init.js"></script>
+	</head>
+	<body>
+		<div id="mocha"></div>
+		<script>
+			require([
+				'collections/concepts_test'
+				// <test scripts>
+			],
+				function() {
+					mocha.run()
+				}
+			);
+		</script>
+	</body>
+</html>

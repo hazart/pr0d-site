@@ -2,11 +2,12 @@ define [
 	'backbone'
 	'underscore'
 	'text!templates/offer/offer.html'
+	'css!templates/offer/offer.css'
 	'views/common/ui/slider/slider_view'
 	'collections/concepts_collection'
 	'collections/offers_collection'
 	'views/app/app_view'	
-], (Backbone, _, tpl, Slider, Concepts, Offers, AppView)->
+], (Backbone, _, tpl, css, Slider, Concepts, Offers, AppView)->
 
 	class OfferView extends Backbone.View
 

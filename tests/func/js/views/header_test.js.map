@@ -1,0 +1,10 @@
+{
+  "version": 3,
+  "file": "header_test.js",
+  "sourceRoot": "../../src/views/",
+  "sources": [
+    "header_test.coffee"
+  ],
+  "names": [],
+  "mappings": "AAAA;CAAA,CAAA,CAA6B,KAA7B,CAA6B,SAA7B;CAEI,CAAH,CAA+C,CAAA,KAAC,EAAhD,+BAAA;CACC,EAAA,EAAA,CAAA,CAAO,iBAAP,IAAA;CAGY,EAAA,MAAA,CAAZ,GAAA;CACC,CAKuC,GALvC,EAAO,CAAP,GAAA,CAAA,EAAA,EAAA,GAAA;CAMY,EAAA,MAAA,CAAZ,KAAA;CACS,GAAR,CAAA,EAAO,OAAP,GAAA;CADD,CAQE,EARF,KAAY;CAPb,CAgBE,EAhBF,GAAY;CAJb,IAA+C;CAFhD,EAA6B;CAA7B"
+}

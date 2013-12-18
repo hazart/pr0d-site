@@ -2,11 +2,12 @@ define [
 	'backbone'
 	'underscore'
 	'text!templates/concept/concept.html'
+	'css!templates/concept/concept.css'
 	'views/common/ui/slider/slider_view'
 	'collections/concepts_collection'
 	'views/app/app_view'
 	'gsap'
-], (Backbone, _, tpl, Slider, Concepts, AppView, gsap)->
+], (Backbone, _, tpl, css, Slider, Concepts, AppView, gsap)->
 
 	class ConceptView extends Backbone.View
 

@@ -2,7 +2,8 @@ define [
 	'backbone'
 	'underscore'
 	'text!templates/blog/blog.html'
-], (Backbone, _, tpl)->
+	'css!templates/blog/blog.css'
+], (Backbone, _, tpl, css)->
 
 	class BlogView extends Backbone.View
 
