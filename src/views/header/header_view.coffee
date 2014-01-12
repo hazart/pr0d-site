@@ -60,7 +60,7 @@ define [
 			else if e? and $(e.target).parents().index($(header)) is -1
 				return
 
-			flegOpen = true
+			flagOpen = true
 			if @currentPart is 'contact'
 				flagOpen = true
 				flagOpen = false if (e)

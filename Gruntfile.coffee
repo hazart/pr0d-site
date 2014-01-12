@@ -13,7 +13,6 @@ module.exports = (grunt)->
 	grunt.loadNpmTasks('grunt-contrib-stylus')
 	grunt.loadNpmTasks('grunt-contrib-requirejs')
 	grunt.loadNpmTasks('grunt-mocha')
-	# grunt.loadNpmTasks('grunt-contrib-testem')
 	grunt.loadNpmTasks('grunt-mocha-webdriver')
 	grunt.loadNpmTasks('grunt-mocha-selenium')
 	grunt.loadNpmTasks('grunt-open')
@@ -24,7 +23,7 @@ module.exports = (grunt)->
 	grunt.loadNpmTasks('grunt-text-replace')
 	grunt.loadNpmTasks('grunt-escaped-seo')
 
-	# configurable paths
+	# configurable variables
 	yeomanConfig = {
 		app: 'assets'
 		src: 'src'
@@ -42,6 +41,9 @@ module.exports = (grunt)->
 
 		ftp_host_preprod: 'FTP.hazart.o2switch.net'
 		ftp_dest_preprod: 'test/'
+
+		saucelabs_username: 'hazart'
+		saucelabs_key: '759c578b-04fd-42b8-aafa-140670ae10b0'
 	}
 
 	#
@@ -202,7 +204,7 @@ module.exports = (grunt)->
 				ext: '.js'
 				options: 
 					runtime: 'inline'
-					sourceMap: true
+					sourceMap: false
 			func:
 				expand: true
 				cwd: '<%= yeoman.test %>/func/src'
@@ -211,7 +213,7 @@ module.exports = (grunt)->
 				ext: '.js'
 				options: 
 					runtime: 'inline'
-					sourceMap: true
+					sourceMap: false
 
 		stylus:
 			dev:
@@ -440,38 +442,6 @@ module.exports = (grunt)->
 					# title: 'Task Complete', 
 					message: 'Build is finished!'
 
-
-		# testem:
-		# 	dev:
-		# 		# url: "http://localhost:9000/"
-		# 		src: [
-		# 			'<%= yeoman.test %>/unit/**/*.js'
-		# 		]
-		# 		options:
-		# 			framework: "mocha"
-		# 			log: true
-		# 			parallel: 8
-		# 			launch_in_ci: ['PhantomJS']
-		# 			launch_in_dev: ['PhantomJS']
-
-		# 			cwd: "<%= yeoman.test %>/unit/"
-
-		# 			test_page: "index.html"
-					
-		# 			src_files: [
-		# 				'<%= yeoman.test %>/unit/**/*.js'
-		# 			]
-		# 			serve_files: [
-		# 				'<%= yeoman.test %>/unit/**/*.js'
-		# 			]
-		# 			routes: {
-		# 				"/components": "../../<%= yeoman.app %>/components"
-		# 				"/js/": "../../<%= yeoman.tmp %>/js"
-		# 				# "/": "<%= yeoman.test %>/unit/"
-		# 			}
-
-		# 			# on_exit: "rm <%= yeoman.test %>/unit/**/*.js*"
-
 		mocha:
 			test:
 				options:
@@ -483,14 +453,30 @@ module.exports = (grunt)->
 					log: true
 					timeout: 60000
 
+		mochaSelenium:
+			options:
+				timeout: 1000 * 60
+				reporter: 'spec'
+				useChaining: true
+			phantom:
+				src: ['<%= yeoman.test %>/func/**/*.js']
+				options:
+					browserName: 'phantomjs'
+			# firefox:
+			# 	src: ['<%= yeoman.test %>/func/**/*.js']
+			# chrome:
+			# 	src: ['<%= yeoman.test %>/func/**/*.js']
+			# 	options:
+			# 		browserName: 'chrome'
+
 		mochaWebdriver:
 			options:
 				timeout: 1000 * 60
 				reporter: 'spec'
 				usePromises: true
 				tunnelTimeout: 1000 * 180
-				username: 'hazart'
-				key: '759c578b-04fd-42b8-aafa-140670ae10b0'
+				username: '<%= yeoman.saucelabs_username %>'
+				key: '<%= yeoman.saucelabs_key %>'
 			# phantom:
 			# 	src: ['<%= yeoman.test %>/func/**/*.js']
 			# 	options:
@@ -508,34 +494,21 @@ module.exports = (grunt)->
 						{browserName: 'chrome', platform: 'Windows 7', version: ''}
 					]
 
-		mochaSelenium:
-			options:
-				timeout: 1000 * 60
-				reporter: 'spec'
-				useChaining: true
-			# phantom:
-			# 	src: ['<%= yeoman.test %>/func/**/*.js']
-			# 	options:
-			# 		browserName: 'phantomjs'
-			firefox:
-				src: ['<%= yeoman.test %>/func/**/*.js']
-			# chrome:
-			# 	src: ['<%= yeoman.test %>/func/**/*.js']
-			# 	options:
-			# 		browserName: 'chrome'
-
 	grunt.event.on('watch', (action, filepath, target) ->
+		src = new RegExp('^'+yeomanConfig.src+'[\\/\\\\]', 'i');
+		srcViews = new RegExp('^'+yeomanConfig.src+'[\\/\\\\]'+'views'+'[\\/\\\\]', 'i');
+
 		if (target is 'coffee' and grunt.file.isMatch( grunt.config('watch.coffee.files'), filepath))
-			grunt.config(['coffee', 'dev', 'src'], [filepath.replace(yeomanConfig.src+'/','')])
+			grunt.config(['coffee', 'dev', 'src'], [filepath.replace(src,'')])
 
 		if (target is 'coffee' and grunt.file.isMatch( grunt.config('watch.coffee.unit'), filepath))
-			grunt.config(['coffee', 'unit', 'src'], [filepath.replace(yeomanConfig.src+'/','')])
+			grunt.config(['coffee', 'unit', 'src'], [filepath.replace(src,'')])
 
 		if (target is 'coffee' and grunt.file.isMatch( grunt.config('watch.coffee.func'), filepath))
-			grunt.config(['coffee', 'func', 'src'], [filepath.replace(yeomanConfig.src+'/','')])
+			grunt.config(['coffee', 'func', 'src'], [filepath.replace(src,'')])
 
 		if (target is 'jade' and grunt.file.isMatch( grunt.config('watch.jade.files'), filepath))
-			fp = filepath.replace(yeomanConfig.src+'/views/','')
+			fp = filepath.replace(srcViews,'')
 			grunt.config(['jade', 'dev', 'files'], [
 					expand: true
 					cwd: '<%= yeoman.src %>/views'
@@ -545,10 +518,9 @@ module.exports = (grunt)->
 				])
 
 		if (target is 'stylus' and grunt.file.isMatch( grunt.config('watch.stylus.files'), filepath))
-			fp = filepath.replace(yeomanConfig.src+'/views/','')
-			grunt.config(['stylus', 'dev', 'files', '0', 'cwd'], '')
-			grunt.config(['stylus', 'dev', 'files', '0', 'src'], [filepath])
-			grunt.config(['autoprefixer', 'all', 'src'], '<%= yeoman.tmp %>/' + filepath.replace(yeomanConfig.src+'/views','templates').replace('.styl','.css'))
+			fp = filepath.replace(srcViews,'')
+			grunt.config(['stylus', 'dev', 'files', '0', 'src'], [filepath.replace(srcViews,'')])
+			grunt.config(['autoprefixer', 'all', 'src'], '<%= yeoman.tmp %>/' + filepath.replace(srcViews,'templates/').replace('.styl','.css'))
 	)
 
 	grunt.registerTask('server', [
@@ -559,54 +531,6 @@ module.exports = (grunt)->
 		'connect:dev'
 		'notify:server'
 		'watch'
-	])
-
-	grunt.registerTask('server-dist', [
-		'connect:dist'
-		'open:dist'
-		'watch:dist'
-	])
-
-	grunt.registerTask('compile', [
-		'jade:dist'
-		'coffee:dist'
-		'stylus:dist'
-		'autoprefixer'
-	])
-
-	grunt.registerTask('seo', [
-		'connect:dist'
-		'escaped-seo:prod'
-	])
-
-	grunt.registerTask('seo-preprod', [
-		'connect:dist'
-		'escaped-seo:preprod'
-	])
-
-	# grunt.registerTask('testem', [
-	# 	'coffee:test'
-	# 	# 'connect:test'
-	# 	'testem:run:dev'
-	# 	# 'testem:ci:dev'
-	# ])
-
-	grunt.registerTask('test-unit', [
-		'coffee:unit'
-		'connect:test'
-		'mocha:test'
-		'watch:unit'
-	])
-
-	grunt.registerTask('test-selenium', [
-		'coffee:func'
-		'mochaSelenium'
-		'watch:func'
-	])
-
-	grunt.registerTask('test-sauce', [
-		'coffee:func'
-		'mochaWebdriver'
 	])
 
 	grunt.registerTask('build', [
@@ -635,14 +559,48 @@ module.exports = (grunt)->
 		'watch:dist'
 	])
 
-	grunt.registerTask('deploy-preprod', [
-		'ftp-deploy:preprod'
+	grunt.registerTask('server-dist', [
+		'connect:dist'
+		'open:dist'
+		'watch:dist'
+	])
+
+	grunt.registerTask('seo', [
+		'connect:dist'
+		'escaped-seo:prod'
+	])
+
+	grunt.registerTask('seo-preprod', [
+		'connect:dist'
+		'escaped-seo:preprod'
 	])
 
 	grunt.registerTask('deploy', [
 		'replace:close'
 		'replace:nodev'
 		'ftp-deploy:prod'
+	])
+
+	grunt.registerTask('test-unit', [
+		'coffee:unit'
+		'connect:test'
+		'mocha:test'
+		'watch:unit'
+	])
+
+	grunt.registerTask('test-selenium', [
+		'coffee:func'
+		'mochaSelenium'
+		'watch:func'
+	])
+
+	grunt.registerTask('test-sauce', [
+		'coffee:func'
+		'mochaWebdriver'
+	])
+
+	grunt.registerTask('deploy-preprod', [
+		'ftp-deploy:preprod'
 	])
 
 	grunt.option('force', true)
